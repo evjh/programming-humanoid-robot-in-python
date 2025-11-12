@@ -43,6 +43,47 @@ class AngleInterpolationAgent(PIDAgent):
         target_joints = {}
         # YOUR CODE HERE
 
+        if self.start_time is None:
+            self.start_time = perception.time
+        
+        names, times, keys = keyframes
+
+        if not names: 
+            return target_joint
+
+        current_time = perception.time - self.start_time
+
+        for i , joint_nme in enumerate(names):
+            if joint_name not in self.joint_names:
+                continue
+
+        joint_times = times[i]
+        joint_keys = keys[i]
+
+        segment_found = False
+        for j in range(len(joint_times)-1):
+            if joint_times[j] <= current_time <= joint_times[j+1]:
+
+                t0 = joint_times[j]
+                t1 = joint_times[j+1]
+                t= (current_time -t0)/(t1-t0)
+                p0 = joint_keys[j][0]
+                p3 = joint_keys[j+1][0]
+                p1 = P0+ joint_keys[j][2][2]
+                2= P3 + joint_keys[j+1][1][2]
+                
+                target_joints[joint_name] = ((1-t)**3)*p0 + 3*t*((1-t)**2)*p1+ 3*(t**2)*(1-t)*p2 +(t**3)*p3
+                break
+                
+            else: 
+            if current_time < current_times[0]:
+                target_joint[joint_name] = joint_keys[0][0]
+            else: target_joints[joint_name] = joint_keys[-1][0]
+
+        if 'LHipYawPitch' in target_joints:
+            target_joints ['RHipYawPitch'] = target_joints['LHipYawPitch']
+        
+
         return target_joints
 
 if __name__ == '__main__':
