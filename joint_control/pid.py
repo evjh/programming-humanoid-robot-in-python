@@ -54,6 +54,22 @@ class PIDController(object):
         '''
         # YOUR CODE HERE
 
+        self.y.append(sensor)
+        e = target - self.y[0]
+
+        du = ((self.Kp + self.Ki * self.dt + self.Kd / self.dt) * e -
+              (self.Kp * 2 self.Kd / self.dt) * self.e1 + (self.Kd / self.dt) * self.e2)
+
+        self.u += du
+
+        max_speed = 6.0
+        self.u = np.clip(self.u, -max_speed, max_speed)
+
+        self.e1 = self.e1.copy()
+        self.e2 = e.copy()
+        
+        
+
         return self.u
 
 
