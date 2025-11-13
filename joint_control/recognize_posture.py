@@ -22,7 +22,13 @@ class PostureRecognitionAgent(AngleInterpolationAgent):
                  sync_mode=True):
         super(PostureRecognitionAgent, self).__init__(simspark_ip, simspark_port, teamname, player_id, sync_mode)
         self.posture = 'unknown'
-        self.posture_classifier = None  # LOAD YOUR CLASSIFIER
+        base_dir = Path(__file__).parent with open(base_dir/'robot_pose.pkl', 'rb') as f:
+            model_data = pickle.load(f)
+            self.posture_classifier = model.data['classifier'] 
+            self.classes = model.data['classes']
+            print("Loaded succesfully") 
+
+    
 
     def think(self, perception):
         self.posture = self.recognize_posture(perception)
@@ -30,7 +36,18 @@ class PostureRecognitionAgent(AngleInterpolationAgent):
 
     def recognize_posture(self, perception):
         posture = 'unknown'
-        # YOUR CODE HERE
+
+        try: joints('LHipYawPitch', 'LHipRoll', 'LHipPitch', 'LKneePitch', 'RHipYawPitch', 'RHipRoll', 'RHipPitch', 'RKneePitch']
+        data = []
+        for joint in joints: 
+            data.append(perception.joint[joint])
+            data += perception.imu
+
+        pred = self.posture_classifier.predict([data])[0]
+        posture = self.classes[pred]
+
+        except Exception as e: 
+        print ("Error in posture recognitionn")
 
         return posture
 
