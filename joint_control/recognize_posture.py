@@ -24,8 +24,8 @@ class PostureRecognitionAgent(AngleInterpolationAgent):
         self.posture = 'unknown'
         base_dir = Path(__file__).parent with open(base_dir/'robot_pose.pkl', 'rb') as f:
             model_data = pickle.load(f)
-            self.posture_classifier = model.data['classifier'] 
-            self.classes = model.data['classes']
+            self.posture_classifier = model_data['classifier'] 
+            self.classes = model_data['classes']
             print("Loaded succesfully") 
 
     
@@ -37,17 +37,17 @@ class PostureRecognitionAgent(AngleInterpolationAgent):
     def recognize_posture(self, perception):
         posture = 'unknown'
 
-        try: joints('LHipYawPitch', 'LHipRoll', 'LHipPitch', 'LKneePitch', 'RHipYawPitch', 'RHipRoll', 'RHipPitch', 'RKneePitch']
+        try: joints['LHipYawPitch', 'LHipRoll', 'LHipPitch', 'LKneePitch', 'RHipYawPitch', 'RHipRoll', 'RHipPitch', 'RKneePitch']
         data = []
         for joint in joints: 
             data.append(perception.joint[joint])
-            data += perception.imu
+        data += perception.imu
 
         pred = self.posture_classifier.predict([data])[0]
         posture = self.classes[pred]
 
         except Exception as e: 
-        print ("Error in posture recognitionn")
+        print ("Error: {e}")
 
         return posture
 
