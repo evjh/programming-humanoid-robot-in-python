@@ -22,6 +22,7 @@ import sys
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'joint_control'))
 
 from numpy.matlib import matrix, identity
+from math import sin, cos 
 
 from recognize_posture import PostureRecognitionAgent
 
@@ -39,8 +40,8 @@ class ForwardKinematicsAgent(PostureRecognitionAgent):
         self.chains = {'Head': ['HeadYaw', 'HeadPitch']
                     'LArm': ['LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll'],
                     'RArm':['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll'],
-                    'LLeg': '[`LHipYawPitch', 'LHipRoll', 'LHipPitch', 'LKneePitch','LAnklePitch', 'LAnkleRoll'],
-                    'RLeg': '[`RHipYawPitch', 'RHipRoll', 'RHipPitch', 'RKneePitch','RAnklePitch', 'RAnkleRoll'],
+                    'LLeg': ['`LHipYawPitch', 'LHipRoll', 'LHipPitch', 'LKneePitch','LAnklePitch', 'LAnkleRoll'],
+                    'RLeg': ['`RHipYawPitch', 'RHipRoll', 'RHipPitch', 'RKneePitch','RAnklePitch', 'RAnkleRoll']
                     }
 
     def think(self, perception):
@@ -63,8 +64,8 @@ class ForwardKinematicsAgent(PostureRecognitionAgent):
             T[1,1] = cos(joint_angle)
         elif 'Pitch' in joint_name:
             T[0,0] = cos(joint_angle)
-            T[0,2] = -sin(joint_angle)
-            T[2,0] = sin(joint_angle)
+            T[0,2] = sin(joint_angle)
+            T[2,0] = -sin(joint_angle)
             T[2,2] = cos(joint_angle)      
 
         if joint_name == 'HeadYaw':
@@ -86,7 +87,7 @@ class ForwardKinematicsAgent(PostureRecognitionAgent):
         elif 'Ankle' in joint_name: 
             T[2,3] = -0.103
                 
-            return T
+        return T
 
     def forward_kinematics(self, joints):
         '''forward kinematics
