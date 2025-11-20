@@ -41,7 +41,7 @@ class ForwardKinematicsAgent(PostureRecognitionAgent):
                     'RArm':['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll'],
                     'LLeg': '[`LHipYawPitch', 'LHipRoll', 'LHipPitch', 'LKneePitch','LAnklePitch', 'LAnkleRoll'],
                     'RLeg': '[`RHipYawPitch', 'RHipRoll', 'RHipPitch', 'RKneePitch','RAnklePitch', 'RAnkleRoll'],
-                    'Head': ['HeadYaw', 'HeadPitch']}
+                    }
 
     def think(self, perception):
         self.forward_kinematics(perception.joint)
@@ -56,9 +56,37 @@ class ForwardKinematicsAgent(PostureRecognitionAgent):
         :rtype: 4x4 matrix
         '''
         T = identity(4)
-        # YOUR CODE HERE
+        if 'Yaw' in joint_name or 'Roll' in joint_name:
+            T[0,0] = cos(joint_angle)
+            T[0,1] = -sin(joint_angle)
+            T[1,0] = sin(joint_angle)
+            T[1,1] = cos(joint_angle)
+        elif 'Pitch' in joint_name:
+            T[0,0] = cos(joint_angle)
+            T[0,2] = -sin(joint_angle)
+            T[2,0] = sin(joint_angle)
+            T[2,2] = cos(joint_angle)      
 
-        return T
+        if joint_name == 'HeadYaw':
+            T[2,3] = 0.1265
+        elif 'Shoulder' in joint_name:
+            T[2,3] = 0.1
+            if 'L' in joint_name:
+                T[1,3] = 0.098
+            else: T[1,3] = -0.098
+        elif 'Elbow' in joint_name:
+            T[0,3] = 0.105
+        elif 'Hip' in joint_name:
+            T[2,3] = -0.085
+            if 'L'in joint_name:
+                T[1,3] = 0.05
+            else: T[1,3] = -0.05
+        elif 'Knee' in joint_name:
+            T[2,3] = -0.1
+        elif 'Ankle' in joint_name: 
+            T[2,3] = -0.103
+                
+            return T
 
     def forward_kinematics(self, joints):
         '''forward kinematics
@@ -70,7 +98,7 @@ class ForwardKinematicsAgent(PostureRecognitionAgent):
             for joint in chain_joints:
                 angle = joints[joint]
                 Tl = self.local_trans(joint, angle)
-                # YOUR CODE HERE
+                T = T @ Tl
 
                 self.transforms[joint] = T
 
