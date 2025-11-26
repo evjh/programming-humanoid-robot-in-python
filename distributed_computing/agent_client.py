@@ -16,48 +16,50 @@ class PostHandler(object):
 
     def execute_keyframes(self, keyframes):
         '''non-blocking call of ClientAgent.execute_keyframes'''
-        # YOUR CODE HERE
+        thread = threading.Thread(target= self.proxy.execute_keyframes(keyframes),args=[keyframes])
+        thread.start()
 
     def set_transform(self, effector_name, transform):
         '''non-blocking call of ClientAgent.set_transform'''
-        # YOUR CODE HERE
+        thread = threading.Thread(target = set.proxy.set_transform, args=[effector_name, trasnform])
+        thread.start
 
 
 class ClientAgent(object):
     '''ClientAgent request RPC service from remote server
     '''
-    # YOUR CODE HERE
     def __init__(self):
         self.post = PostHandler(self)
+        self.client = rpc.client.ServerProxy("http://localhost:8000", allow_none = "True")
     
     def get_angle(self, joint_name):
         '''get sensor value of given joint'''
-        # YOUR CODE HERE
+        return self.client.get_angle(joint_name)
     
     def set_angle(self, joint_name, angle):
         '''set target angle of joint for PID controller
         '''
-        # YOUR CODE HERE
+        return self.client.set_angle(joint_name, angle)
 
     def get_posture(self):
         '''return current posture of robot'''
-        # YOUR CODE HERE
+        return self.client.get_posture()
 
     def execute_keyframes(self, keyframes):
         '''excute keyframes, note this function is blocking call,
         e.g. return until keyframes are executed
         '''
-        # YOUR CODE HERE
+        return self.client.execute_keyframes(keyframes)
 
     def get_transform(self, name):
         '''get transform with given name
         '''
-        # YOUR CODE HERE
+        return self.client.get_transform(name)
 
     def set_transform(self, effector_name, transform):
         '''solve the inverse kinematics and control joints use the results
         '''
-        # YOUR CODE HERE
+        return self.client.set_transform(effector_name, transform.tolist())
 
 if __name__ == '__main__':
     agent = ClientAgent()
